@@ -1,4 +1,3 @@
-
 import pygame
 from pygame.locals import *
 import sys
@@ -40,8 +39,6 @@ class Game:
         self.screen = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Speed test')
 
-
-
     def draw_text(self, screen, msg, y, x, fsize, color):
         font = pygame.font.Font(None, fsize)
         text = font.render(msg, 1, color)
@@ -56,7 +53,7 @@ class Game:
         message = textwrap.fill(message, 80)
         for part in message.split('\n'):
             rendered_text = font_object.render(part, True, color)
-            text_rect=rendered_text.get_rect(center=(xy[0], xy[1]))
+            text_rect = rendered_text.get_rect(center=(xy[0], xy[1]))
             self.input_rect.h = max(100, rendered_text.get_height() + 26)
             screen.blit(rendered_text, text_rect)
             xy[1] += 20
@@ -92,14 +89,13 @@ class Game:
 
             # Calculate accuracy
             count = 0
-            for i, c in enumerate(self.word or self.para):
+            for i, c in enumerate(self.word):
                 try:
                     if self.input_text[i] == c:
                         count += 1
                 except:
                     pass
             self.accuracy = count / len(self.word) * 100
-
 
             # Calculate words per minute
             self.wpm = len(self.input_text) * 60 / (5 * self.total_time)
@@ -129,7 +125,7 @@ class Game:
             self.screen.fill((0, 0, 0), self.input_rect)
             pygame.draw.rect(self.screen, self.HEAD_C, self.input_rect, 2)
 
-            self.message_display_input(26,(0,250,255),self.w/2,355,self.input_text,self.screen)
+            self.message_display_input(26, (0, 250, 255), self.w / 2, 355, self.input_text, self.screen)
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -150,17 +146,20 @@ class Game:
                     # draw sentences
                     if 130 <= y <= 160 and 190 <= x <= 290:
                         self.word = self.get_sentence()
+                        if not self.word:
+                            self.reset_game(self.screen)
                         self.draw_text(self.screen, self.word, 270, self.w / 2, 28, self.TEXT_C)
                         self.time_start = time.time()
-                        pygame.mouse.set_pos(475,365)
+                        pygame.mouse.set_pos(475, 365)
 
                     # draw paragraphs
                     if 130 <= y <= 170 and 660 <= x <= 760:
                         self.word = self.get_para()
-                        self.para_display(28, self.TEXT_C, 90, 200, self.para, self.screen)
+                        if not self.word:
+                            self.reset_game(self.screen)
+                        self.para_display(28, self.TEXT_C, 90, 200, self.word, self.screen)
                         self.time_start = time.time()
                         pygame.mouse.set_pos(475, 365)
-
 
                 elif event.type == pygame.KEYDOWN:
                     if self.active and not self.end:
@@ -199,13 +198,6 @@ class Game:
         self.time_start = 0
         self.total_time = 0
         self.wpm = 0
-
-        # Get random sentence and paragraph
-
-
-
-        if not self.word:
-            self.reset_game(self.screen)
 
         # drawing heading
         self.screen.fill((0, 0, 0))
